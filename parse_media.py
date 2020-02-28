@@ -45,11 +45,22 @@ def parse_file_name(file_name, format='{series} - S{season}E{episode} - {quality
 
 
 def scan_media(path):
+    """
+    Scan given path to get a filenames <--> series/season/episode mapping
+
+    Returns:
+        [dict] -- filenames <--> series/season/episode mapping
+    """
     if path is None:
         path = os.getcwd()
+    format = os.environ.get('FILE_NAME_FORMAT', '{series} - S{season}E{episode} - {quality}')
 
     medias = {}
 
     file_names = get_media_file_names(path)
     for file_name in file_names:
-        info = parse_file_name(file_name)
+        ext = file_name.split('.')[-1]
+        info = parse_file_name(file_name, format=format)
+        medias[file_name[:len(ext)+1]] = info
+
+    return medias
