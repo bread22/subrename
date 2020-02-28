@@ -7,7 +7,7 @@ from parse import parse
 MEDIA_EXTS = ['.mkv', '.avi', '.mp4']
 
 
-def get_media_file_names(path=None):
+def get_file_names(path, exts):
     """Scan existing media file names
 
     Keyword Arguments:
@@ -20,8 +20,7 @@ def get_media_file_names(path=None):
         path = os.getcwd()
 
     file_names = os.listdir(path)
-    file_names = [file_name.lower() for file_name in file_names]
-    file_names = [file_name for file_name in file_names if any(file_name.endswith(ext) for ext in MEDIA_EXTS)]
+    file_names = [file_name for file_name in file_names if any(file_name.lower().endswith(ext) for ext in exts)]
 
     return file_names
 
@@ -57,7 +56,7 @@ def scan_media(path):
 
     medias = {}
 
-    file_names = get_media_file_names(path)
+    file_names = get_file_names(path, exts=MEDIA_EXTS)
     for file_name in file_names:
         ext = file_name.split('.')[-1]
         info = parse_file_name(file_name, format=format)
