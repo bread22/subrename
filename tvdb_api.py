@@ -31,7 +31,7 @@ class TVDBClient(object):
             "apikey": environ.get('TVDB_API', TVDB_API),
         }
         self.base_url = 'https://api.thetvdb.com'
-        self.__saved_token = None
+        self.__saved_token = self._generate_token()
         self._urls = self._generate_urls()
 
     @property
