@@ -1,0 +1,14 @@
+{
+    "SUBTITLES_EXTS": [".srt", ".ssa", ".ass"],
+    "MEDIA_EXTS": [".mkv", ".avi", ".mp4"],
+    "SEARCH_LANGS": ["en", "ja", "zh"],
+    "SUBTITLE_LANG": "zh",
+    "SEASON_EPISODE_FORMATS": [
+        "S{season}E{episode}",
+        "S{season}EP{episode}",
+        "Season {season} Episode {episode}",
+        "Season{season} Episode{episode}",
+        "Season {season} EP-{episode}",
+        "S{season} EP-{episode}"
+    ]
+}

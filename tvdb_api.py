@@ -9,7 +9,7 @@ from os import environ
 import logging
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('subrename.tvdb_api')
 TVDB_API = 'd2a588f501980d2c9a795fee12d64c0c'
 TVDB_USER = 'bread22'
 TVDB_USERKEY = 'YETVS2RB6WU3SYZP'

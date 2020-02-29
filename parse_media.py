@@ -1,9 +1,11 @@
 """Parse directory to analyze media files
 """
 import os
+import logging
 from parse import parse
+from pprint import pformat
 
-
+log = logging.getLogger('subrename.parse_media')
 MEDIA_EXTS = ['.mkv', '.avi', '.mp4']
 
 
@@ -21,7 +23,8 @@ def get_file_names(path, exts):
 
     file_names = os.listdir(path)
     file_names = [file_name for file_name in file_names if any(file_name.lower().endswith(ext) for ext in exts)]
-
+    log.debug("Found files:")
+    log.debug(pformat(file_names))
     return file_names
 
 
@@ -53,13 +56,12 @@ def scan_media(path=None):
     if path is None:
         path = os.getcwd()
     format = os.environ.get('FILE_NAME_FORMAT', '{series} - S{season}E{episode} - {quality}')
-
+    log.info("Scanning '{0}' with format {1}".format(path, format))
     medias = {}
 
     file_names = get_file_names(path, exts=MEDIA_EXTS)
     for file_name in file_names:
-        ext = file_name.split('.')[-1]
         info = parse_file_name(file_name, format=format)
-        medias[file_name[:-len(ext)-1]] = info
+        medias[file_name] = info
 
     return medias
