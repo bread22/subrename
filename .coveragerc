@@ -3,5 +3,5 @@ omit =
     # omit venv
     */py3venv/*
     # omit tmp.py
-    /tmp.py
-    /test_*
+    tmp.py
+    test_*
