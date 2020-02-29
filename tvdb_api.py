@@ -5,15 +5,16 @@ import requests
 import json
 from typing import List, Union
 from urllib.parse import urljoin
-from os import environ
 import logging
+
+from providers import TVShowProvider
 from utils import load_config
 
 
 log = logging.getLogger('subrename.tvdb_api')
 
 
-class TVDBClient(object):
+class TVDBClient(TVShowProvider):
     ID_KEY = 'id'
     SEASON_KEY = 'airedSeason'
     SEASONID_KEY = 'airedSeasonID'

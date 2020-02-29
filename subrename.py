@@ -91,8 +91,8 @@ def find_episode_metadata_for_media(media_info, data_cache):
 def find_matching_subs(media_info, sub_files):
 
     config = load_config()
-    season_episode_fmts = config['SEASON_EPISODE_FORMATS', []]
-    episode_only_fmts = config['EPISODE_ONLY_FORMATS', []]
+    season_episode_fmts = config.get('SEASON_EPISODE_FORMATS', [])
+    episode_only_fmts = config.get('EPISODE_ONLY_FORMATS', [])
 
     series = media_info['series']
     season = media_info['season']
@@ -190,7 +190,8 @@ def main():
 
     # Query all series espisode data
     data_cache = {}
-    for series, tvdb_id in series_table.items():
+    for series, info in series_table.items():
+        tvdb_id = info.get('id')
         for language in search_languages:
             data = data_cache.setdefault(series, [])
             data += db_client.get_episodes_by_series_id(tvdb_id, language=language)
