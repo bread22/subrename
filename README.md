@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/bread22/subrename.svg?branch=master)](https://travis-ci.com/bread22/subrename)
+[![Build Status](https://travis-ci.com/bread22/subrename.svg?branch=master)](https://travis-ci.com/bread22/subrename)  [![GitHub license](https://img.shields.io/github/license/bread22/subrename.svg)](https://github.com/bread22/subrename/blob/master/LICENSE)  [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/bread22/subrename.js/graphs/commit-activity)
+
 # subrename
 
 This is a small utility to batch rename subtitle files to match media files.
