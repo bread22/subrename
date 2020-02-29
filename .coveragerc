@@ -1,0 +1,6 @@
+[run]
+omit =
+    # omit venv
+    */py3venv/*
+    # omit tmp.py
+    /tmp.py
