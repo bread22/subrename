@@ -31,15 +31,15 @@ class TVDBClient(object):
             "apikey": environ.get('TVDB_API', TVDB_API),
         }
         self.base_url = 'https://api.thetvdb.com'
-        self.__saved_token = self._generate_token()
         self._urls = self._generate_urls()
+        self.__saved_token = self._generate_token()
 
     @property
     def _token(self):
         if self.__saved_token is None:
-            self.__save_token = self._generate_token()
+            self.__saved_token = self._generate_token()
 
-        return self.__save_token
+        return self.__saved_token
 
     def _generate_urls(self):
         urls = {
@@ -75,14 +75,14 @@ class TVDBClient(object):
         }
         return requests.get(url, headers=headers, params=query_params)
 
-    def _update_token(self):
+    def _refresh_token(self):
         response = self._get_with_token(self._urls["refresh_token"])
         if response.status_code == 401:
             raise ConnectionRefusedError("Invalid token")
         if response.status_code != 200:
             raise ConnectionError("Unexpected Response.")
 
-        self.__save_token = response.json()["token"]
+        self.__saved_token = response.json()["token"]
 
     def _get(self, url, query_params=None, *, allow_401=True):
         response = self._get_with_token(url, query_params)
@@ -94,9 +94,9 @@ class TVDBClient(object):
 
         elif response.status_code == 401 and allow_401:
             try:
-                self._update_token()
+                self._refresh_token()
             except ConnectionError:
-                self._save_token(self._generate_token())
+                self.__saved_token = self._generate_token()
 
             return self._get(url, allow_401=False)
 
