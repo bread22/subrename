@@ -70,7 +70,7 @@ class TVDBClient(object):
     def _get_with_token(self, url, query_params=None, language=None):
         headers = {
             "Accept": "application/json",
-            "Authorization": f"Bearer {self._token}",
+            "Authorization": "Bearer {0}".format(self._token),
         }
         if language:
             headers['Accept-Language'] = language
