@@ -8,7 +8,6 @@ from pprint import pformat
 from utils import load_config
 
 log = logging.getLogger('subrename.parse_media')
-MEDIA_EXTS = ['.mkv', '.avi', '.mp4']
 
 
 def get_file_names(path, exts):
@@ -30,22 +29,23 @@ def get_file_names(path, exts):
     return file_names
 
 
-def parse_file_name(file_name, format='{series} - S{season}E{episode} - {quality}'):
+def parse_file_name(file_name, fformat='{series} - S{season}E{episode} - {quality}'):
     """ Parse file name to get series/season/episode info
 
     Arguments:
         file_name {str} -- file name
 
     Keyword Arguments:
-        format {str} -- file name format (default: {'{series} - S{season}E{episode} - {quality}'})
+        fformat {str} -- file name format (default: {'{series} - S{season}E{episode} - {quality}'})
 
     Returns:
         [dict] -- a dict including series/season/episode info
     """
-    p = parse(format, file_name)
-    return {'series': p['series'],
-            'season': int(p['season']),
-            'episode': int(p['episode'])}
+    p = parse(fformat, file_name)
+    if p:
+        return {'series': p['series'],
+                'season': int(p['season']),
+                'episode': int(p['episode'])}
 
 
 def scan_media(path=None):
@@ -56,17 +56,20 @@ def scan_media(path=None):
         [dict] -- filenames <--> series/season/episode mapping
     """
     config = load_config()
-    media_file_format = config.get('MEDIA_FILE_FORMAT')
+    media_file_name_format = config.get('MEDIA_FILE_NAME_FORMAT')
+    media_file_exts = config.get('MEDIA_EXTS')
+
     if path is None:
         path = os.getcwd()
-    if not media_file_format:
+    if not media_file_name_format:
         raise ValueError("Missing media file format, define it in config.json FILE_NAME_FORMAT")
-    log.info("Scanning '{0}' with format {1}".format(path, media_file_format))
+    log.info("Scanning '{0}' with format {1}".format(path, media_file_name_format))
     medias = {}
 
-    file_names = get_file_names(path, exts=MEDIA_EXTS)
+    file_names = get_file_names(path, exts=media_file_exts)
     for file_name in file_names:
-        info = parse_file_name(file_name, format=media_file_format)
-        medias[file_name] = info
+        info = parse_file_name(file_name, fformat=media_file_name_format)
+        if info:
+            medias[file_name] = info
 
     return medias
