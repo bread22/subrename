@@ -43,7 +43,7 @@ def parse_file_name(file_name, format='{series} - S{season}E{episode} - {quality
             'episode': int(p['episode'])}
 
 
-def scan_media(path):
+def scan_media(path=None):
     """
     Scan given path to get a filenames <--> series/season/episode mapping
 

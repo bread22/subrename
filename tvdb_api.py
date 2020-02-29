@@ -140,11 +140,11 @@ class TVDBClient(object):
             for series in info
         ]
 
-    def get_episodes_by_series(self, tvdb_id: Union[str, int]) -> List[dict]:
+    def get_episodes_by_series_id(self, tvdb_id: Union[str, int]) -> List[dict]:
         """
         Get all the episodes for a TV series
         """
         base_url = self._urls["series_episodes"].format(id=tvdb_id)
         full_data = self._get(base_url)
 
-        return full_data
+        return full_data['data']

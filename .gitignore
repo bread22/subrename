@@ -1,3 +1,7 @@
 py3venv/
 .vscode/
 /tmp.py
+tvbd_cache.sqlite
+*.ssa
+*.mkv
+*.mp4
