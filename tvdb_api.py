@@ -16,11 +16,15 @@ TVDB_USERKEY = 'YETVS2RB6WU3SYZP'
 requests_cache.install_cache('tvbd_cache')
 
 
-class TVDBClient:
-    __slots__ = ["_auth_data", "_cache", "_saved_token", "_urls"]
-    _cache_token_key = "tvdb_token"
+class TVDBClient(object):
+    ID_KEY = 'id'
+    SEASON_KEY = 'airedSeason'
+    SEASONID_KEY = 'airedSeasonID'
+    EPISODE_KEY = 'airedEpisodeNumber'
+    EPISODE_NAME_KEY = 'episodeName'
+    ABS_EPISODE_KEY = 'absoluteNumber'
 
-    def __init__(self, username, user_key, api_key, cache=None):
+    def __init__(self):
         self._auth_data = {
             "username": environ.get('TVDB_USER', TVDB_USER),
             "userkey": environ.get('TVDB_USERKEY', TVDB_USERKEY),
@@ -83,7 +87,7 @@ class TVDBClient:
     def _get(self, url, query_params=None, *, allow_401=True):
         response = self._get_with_token(url, query_params)
         if response.status_code == 200:
-            return json.loads(response.content.decode("utf-8"))
+            return response.json()
 
         elif response.status_code == 404:
             raise LookupError("There are no data for this term.")
@@ -142,10 +146,5 @@ class TVDBClient:
         """
         base_url = self._urls["series_episodes"].format(id=tvdb_id)
         full_data = self._get(base_url)
-        data = full_data["data"]
-        number_of_pages = int(full_data["links"]["last"])
-        url = base_url + "?page={page_number}"
-        for page_number in range(2, number_of_pages + 1):
-            data += self._get(url.format(page_number=page_number))["data"]
 
-        return data
+        return full_data
