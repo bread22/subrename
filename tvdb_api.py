@@ -103,12 +103,12 @@ class TVDBClient(object):
 
         raise ConnectionError("Unexpected Response.")
 
-    def get_series_by_id(self, tvdb_id: Union[str, int]) -> dict:
+    def get_series_by_id(self, tvdb_id: Union[str, int], language=None) -> dict:
         """
         Get the series info by its tvdb ib
         """
         url = self._urls["series"].format(id=tvdb_id)
-        return self._get(url)["data"]
+        return self._get(url, language=language)["data"]
 
     def get_series_by_imdb_id(self, imdb_id: str) -> dict:
         """
