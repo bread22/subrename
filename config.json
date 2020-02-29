@@ -1,7 +1,7 @@
 {
-    "MEDIA_FILE_FORMAT": "{series} - S{season}E{episode} - {quality}",
-    "SUBTITLES_EXTS": [".srt", ".ssa", ".ass"],
+    "MEDIA_FILE_NAME_FORMAT": "{series} - S{season}E{episode} - {quality}",
     "MEDIA_EXTS": [".mkv", ".avi", ".mp4"],
+    "SUBTITLES_EXTS": [".srt", ".ssa", ".ass"],
     "SEARCH_LANGS": ["en", "ja", "zh"],
     "SUBTITLE_LANG": "zh",
     "SEASON_EPISODE_FORMATS": [
@@ -11,6 +11,14 @@
         "Season{season} Episode{episode}",
         "Season {season} EP-{episode}",
         "S{season} EP-{episode}"
+    ],
+    "EPISODE_ONLY_FORMATS": [
+        "EP{episode}",
+        "EP-{episode}",
+        "第{episode}集",
+        "episode {episode}",
+        "[{episode}]",
+        "第{episode}話"
     ],
     "TVDB_API": "your API key here",
     "TVDB_USER":  "your tvdb username",

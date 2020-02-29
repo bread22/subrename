@@ -2,6 +2,7 @@ from copy import deepcopy
 from os import rename
 import logging
 import re
+from os.path import splitext
 
 import parse_media
 import tvdb_api
@@ -89,7 +90,16 @@ def find_episode_metadata_for_media(media_info, data_cache):
 
 
 def find_matching_subs(media_info, sub_files):
+    """ Look for match subtitle file
 
+    Arguments:
+        media_info {dict} -- episode info
+        sub_files {list} -- list of subtitle files
+
+    Returns:
+        [str] -- matching subtitle file name if it is found,
+                 otherwise None
+    """
     config = load_config()
     season_episode_fmts = config.get('SEASON_EPISODE_FORMATS', [])
     episode_only_fmts = config.get('EPISODE_ONLY_FORMATS', [])
@@ -169,7 +179,7 @@ def _match_sub_by_episode(episode, series_names, sub_files, formats):
     for sub_file in sub_files:
         sub_file_tmp = sub_file.lower().replace('.', ' ').replace('_', ' ')
         for fmt in formats:
-            pattern = fmt.replace('{episode}', '([0-9]{1,3})')
+            pattern = fmt.replace('{episode}', '([0-9]{1,3})').replace('[', r'\[').replace(']', r'\]')
             match = re.findall(pattern.lower(), sub_file_tmp)
             if match:
                 sub_episode = match[0]
@@ -206,15 +216,17 @@ def main():
         sub_file = find_matching_subs(episode_meta, sub_files)
         if sub_file:
             matching_subs.append((media_file, sub_file))
+        else:
+            log.warning("No subtitle is found.")
 
     # Rename matching subtitles
-    # for media_file, sub_file in matching_subs:
-    #     file_name = media_file[:-(len(media_file.split('.')[-1] + 1))]
-    #     rename(sub_file, '{0}.{1}.{2}'.format(file_name, config['SUBTITLE_LANG'], sub_file.split('.')[-1]))
-
-    print(series_table)
-    # print(data_cache)
-    print(matching_subs)
+    for media_file, sub_file in matching_subs:
+        filename, _ = splitext(media_file)
+        _, sub_ext = splitext(sub_file)
+        new_sub = '{0}.{1}{2}'.format(filename, config['SUBTITLE_LANG'], sub_ext)
+        if sub_file != new_sub:
+            log.info("Renaming {0} to {1}".format(sub_file, new_sub))
+            rename(sub_file, new_sub)
 
 
 if __name__ == '__main__':
