@@ -60,6 +60,6 @@ def scan_media(path=None):
     for file_name in file_names:
         ext = file_name.split('.')[-1]
         info = parse_file_name(file_name, format=format)
-        medias[file_name[:len(ext)+1]] = info
+        medias[file_name[:-len(ext)-1]] = info
 
     return medias
