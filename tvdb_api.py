@@ -2,7 +2,6 @@
 TheTVDB API
 """
 import requests
-import requests_cache
 import json
 from typing import List, Union
 from urllib.parse import urljoin
@@ -12,8 +11,6 @@ from os import environ
 TVDB_API = 'd2a588f501980d2c9a795fee12d64c0c'
 TVDB_USER = 'bread22'
 TVDB_USERKEY = 'YETVS2RB6WU3SYZP'
-
-requests_cache.install_cache('tvbd_cache')
 
 
 class TVDBClient(object):
@@ -68,11 +65,13 @@ class TVDBClient(object):
 
         return response.json()["token"]
 
-    def _get_with_token(self, url, query_params=None):
+    def _get_with_token(self, url, query_params=None, language=None):
         headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self._token}",
         }
+        if language:
+            headers['Accept-Language'] = language
         return requests.get(url, headers=headers, params=query_params)
 
     def _refresh_token(self):
@@ -84,8 +83,8 @@ class TVDBClient(object):
 
         self.__saved_token = response.json()["token"]
 
-    def _get(self, url, query_params=None, *, allow_401=True):
-        response = self._get_with_token(url, query_params)
+    def _get(self, url, query_params=None, *, allow_401=True, language=None):
+        response = self._get_with_token(url, query_params, language=language)
         if response.status_code == 200:
             return response.json()
 
@@ -140,11 +139,11 @@ class TVDBClient(object):
             for series in info
         ]
 
-    def get_episodes_by_series_id(self, tvdb_id: Union[str, int]) -> List[dict]:
+    def get_episodes_by_series_id(self, tvdb_id: Union[str, int], language=None) -> List[dict]:
         """
         Get all the episodes for a TV series
         """
         base_url = self._urls["series_episodes"].format(id=tvdb_id)
-        full_data = self._get(base_url)
+        full_data = self._get(base_url, language=language)
 
         return full_data['data']
