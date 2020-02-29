@@ -7,12 +7,10 @@ from typing import List, Union
 from urllib.parse import urljoin
 from os import environ
 import logging
+from utils import load_config
 
 
 log = logging.getLogger('subrename.tvdb_api')
-TVDB_API = 'd2a588f501980d2c9a795fee12d64c0c'
-TVDB_USER = 'bread22'
-TVDB_USERKEY = 'YETVS2RB6WU3SYZP'
 
 
 class TVDBClient(object):
@@ -24,10 +22,11 @@ class TVDBClient(object):
     ABS_EPISODE_KEY = 'absoluteNumber'
 
     def __init__(self):
+        config = load_config()
         self._auth_data = {
-            "username": environ.get('TVDB_USER', TVDB_USER),
-            "userkey": environ.get('TVDB_USERKEY', TVDB_USERKEY),
-            "apikey": environ.get('TVDB_API', TVDB_API),
+            "username": config.get('TVDB_USER'),
+            "userkey": config.get('TVDB_USERKEY'),
+            "apikey": config.get('TVDB_API'),
         }
         self.base_url = 'https://api.thetvdb.com'
         self._urls = self._generate_urls()

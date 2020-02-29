@@ -11,5 +11,8 @@
         "Season{season} Episode{episode}",
         "Season {season} EP-{episode}",
         "S{season} EP-{episode}"
-    ]
+    ],
+    "TVDB_API": "your API key here",
+    "TVDB_USER":  "your tvdb username",
+    "TVDB_USERKEY": "you unique tvdb userkey"
 }
