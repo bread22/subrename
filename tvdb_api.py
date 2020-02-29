@@ -6,8 +6,10 @@ import json
 from typing import List, Union
 from urllib.parse import urljoin
 from os import environ
+import logging
 
 
+log = logging.getLogger(__name__)
 TVDB_API = 'd2a588f501980d2c9a795fee12d64c0c'
 TVDB_USER = 'bread22'
 TVDB_USERKEY = 'YETVS2RB6WU3SYZP'
@@ -55,7 +57,7 @@ class TVDBClient(object):
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-
+        log.info("Generate TheTVDB token.")
         response = requests.post(url, headers=headers, data=json.dumps(self._auth_data))
         if response.status_code == 401:
             raise ConnectionRefusedError("Invalid credentials.")
@@ -143,6 +145,7 @@ class TVDBClient(object):
         """
         Get all the episodes for a TV series
         """
+        log.info("Get episode metadata for '{0}', language '{1}'".format(tvdb_id, language))
         base_url = self._urls["series_episodes"].format(id=tvdb_id)
         full_data = self._get(base_url, language=language)
 
