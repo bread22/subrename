@@ -91,12 +91,14 @@ def find_episode_metadata_for_media(media_info, data_cache):
 def find_matching_subs(media_info, sub_files):
 
     config = load_config()
-    season_episode_fmts = config['SEASON_EPISODE_FORMATS']
+    season_episode_fmts = config['SEASON_EPISODE_FORMATS', []]
+    episode_only_fmts = config['EPISODE_ONLY_FORMATS', []]
 
     series = media_info['series']
     season = media_info['season']
     episode = media_info['episode']
     names = media_info['names']
+    series_names = media_info['series_names']
     log.info('Searching for series {0}, season {1}, episode {2}'.format(series, season, episode))
 
     # 1, episode name matching
@@ -105,11 +107,15 @@ def find_matching_subs(media_info, sub_files):
         return match
 
     # 2, season/episode number matching
-    match = _match_sub_by_season_episode(season, episode, names, sub_files=sub_files, formats=season_episode_fmts)
+    match = _match_sub_by_season_episode(season, episode, series_names, sub_files, season_episode_fmts)
     if match:
         return match
 
     # 3, episode only matching
+    log.warning('Looking for a matching subtitle with episode number only.')
+    match = _match_sub_by_episode(episode, series_names, sub_files, episode_only_fmts)
+    if match:
+        return match
 
 
 def _match_sub_by_name(names, sub_files):
@@ -131,14 +137,14 @@ def _match_sub_by_name(names, sub_files):
                 return sub_file
 
 
-def _match_sub_by_season_episode(season, episode, names, sub_files, formats):
+def _match_sub_by_season_episode(season, episode, series_names, sub_files, formats):
     """ Match by season/episode number
 
     Requires series name in subtitle file name
 
     Arguments:
-        season {[type]} -- [description]
-        episode {[type]} -- [description]
+        season {int} -- season number
+        episode {int} -- episode number
         names {[type]} -- [description]
         sub_files {[type]} -- [description]
         formats {[type]} -- [description]
@@ -153,13 +159,23 @@ def _match_sub_by_season_episode(season, episode, names, sub_files, formats):
             match = re.findall(pattern.lower(), sub_file_tmp)
             if match:
                 sub_season, sub_episode = match[0]
-                if int(sub_season) == season and int(sub_episode) == episode:
+                if int(sub_season) == season and int(sub_episode) == episode \
+                        and any(sn.lower() in sub_file_tmp for sn in series_names):
                     log.info("S/E match is found '{0}'".format(sub_file))
                     return sub_file
 
 
-def _match_sub_by_episode():
-    pass
+def _match_sub_by_episode(episode, series_names, sub_files, formats):
+    for sub_file in sub_files:
+        sub_file_tmp = sub_file.lower().replace('.', ' ').replace('_', ' ')
+        for fmt in formats:
+            pattern = fmt.replace('{episode}', '([0-9]{1,3})')
+            match = re.findall(pattern.lower(), sub_file_tmp)
+            if match:
+                sub_episode = match[0]
+                if int(sub_episode) == episode and any(sn.lower() in sub_file_tmp for sn in series_names):
+                    log.info("Episode number match is found '{0}'".format(sub_file))
+                    return sub_file
 
 
 def main():
@@ -170,6 +186,7 @@ def main():
     db_client = tvdb_api.TVDBClient()
     media_files = parse_media.scan_media()
     series_table = get_series_ids(media_files, db_client)
+    series_table = update_series_alt_names(series_table, db_client)
 
     # Query all series espisode data
     data_cache = {}
@@ -184,6 +201,7 @@ def main():
     matching_subs = []
     for media_file, metadata in media_files.items():
         episode_meta = find_episode_metadata_for_media(metadata, data_cache)
+        episode_meta['series_names'] = series_table.get(episode_meta['series'])['names']
         sub_file = find_matching_subs(episode_meta, sub_files)
         if sub_file:
             matching_subs.append((media_file, sub_file))
