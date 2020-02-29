@@ -5,3 +5,10 @@ tvbd_cache.sqlite
 *.ssa
 *.mkv
 *.mp4
+*.pyc
+__pycache__/
+.pytest_cache/
+__pycache__/parse_media.cpython-36.pyc
+__pycache__/tvdb_api.cpython-36.pyc
+/__pycache__/parse_media.cpython-36.pyc
+/__pycache__/tvdb_api.cpython-36.pyc
