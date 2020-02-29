@@ -1,11 +1,11 @@
-import parse_media
-import tvdb_api
 from copy import deepcopy
-from os import environ, rename
+from os import rename
 import logging
-import json
 import re
 
+import parse_media
+import tvdb_api
+from utils import load_config
 
 log = logging.getLogger('subrename')
 log.setLevel(logging.DEBUG)
@@ -39,7 +39,34 @@ def get_series_ids(media_files, db_client):
         elif len(matching_series) > 1:
             raise ValueError("More than one match are found with name '{0}', \
                 need more information (maybe year)".format(series))
-        series_table[series] = matching_series[0]['tvdb_id']
+        series_table[series] = {'id': matching_series[0]['tvdb_id'],
+                                'names': [series]}
+
+    return series_table
+
+
+def update_series_alt_names(series_table, db_client):
+    """ Update names in other languages for series
+
+    Arguments:
+        series_table {dict} -- series table with name(en) to id mapping
+                                ex: {'Planetes': {'id':75796, 'names': ['Planetes']}}
+
+    Returns:
+        series_table -- updated series_table with other names
+                                ex: {'Planetes': {'id':75796, 'names': ['Planetes', 'プラネテス', '星空之旅']}}
+    """
+    config = load_config()
+    search_languages = set(config.get('SEARCH_LANGS', ['en']))
+    search_languages.remove('en')
+
+    for series in series_table:
+        for language in search_languages:
+            metadata = db_client.get_series_by_id(series_table[series]['id'], language=language)
+            series_name = metadata.get('seriesName')
+            if series_name:
+                series_table[series]['names'].append(series_name)
+        series_table[series]['names'] = set(series_table[series]['names'])
 
     return series_table
 
@@ -61,7 +88,7 @@ def find_episode_metadata_for_media(media_info, data_cache):
     return episode
 
 
-def find_matching_subs(media_info, files):
+def find_matching_subs(media_info, sub_files):
 
     config = load_config()
     season_episode_fmts = config['SEASON_EPISODE_FORMATS']
@@ -69,19 +96,59 @@ def find_matching_subs(media_info, files):
     series = media_info['series']
     season = media_info['season']
     episode = media_info['episode']
+    names = media_info['names']
     log.info('Searching for series {0}, season {1}, episode {2}'.format(series, season, episode))
 
     # 1, episode name matching
-    for name in media_info['names']:
-        for sub_file in files:
+    match = _match_sub_by_name(names, sub_files=sub_files)
+    if match:
+        return match
+
+    # 2, season/episode number matching
+    match = _match_sub_by_season_episode(season, episode, names, sub_files=sub_files, formats=season_episode_fmts)
+    if match:
+        return match
+
+    # 3, episode only matching
+
+
+def _match_sub_by_name(names, sub_files):
+    """Match by exact name
+
+    Use possible episode names to match subtitle files
+
+    Arguments:
+        names {list} -- possible episode names in different languages
+        sub_files {list} -- existing subtitle files
+
+    Returns:
+        [str] -- if match is found, return matching file name, otherwise None
+    """
+    for name in names:
+        for sub_file in sub_files:
             if name.lower() in sub_file.lower():
                 log.info('Name match FOUND: {0} in {1}'.format(name, sub_file))
                 return sub_file
 
-    # 2, season/episode number matching
-    for sub_file in files:
+
+def _match_sub_by_season_episode(season, episode, names, sub_files, formats):
+    """ Match by season/episode number
+
+    Requires series name in subtitle file name
+
+    Arguments:
+        season {[type]} -- [description]
+        episode {[type]} -- [description]
+        names {[type]} -- [description]
+        sub_files {[type]} -- [description]
+        formats {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
+    """
+    for sub_file in sub_files:
         sub_file_tmp = sub_file.lower().replace('.', ' ').replace('_', ' ')
-        for fmt in season_episode_fmts:
+        for fmt in formats:
             pattern = fmt.replace('{season}', '([0-9]{1,3})').replace('{episode}', '([0-9]{1,3})')
             match = re.findall(pattern.lower(), sub_file_tmp)
             if match:
@@ -90,19 +157,15 @@ def find_matching_subs(media_info, files):
                     log.info("S/E match is found '{0}'".format(sub_file))
                     return sub_file
 
-    # 3, episode only matching
-    
 
-
-def load_config():
-    with open('config.json') as fn:
-        config = fn.read()
-    return json.loads(config)
+def _match_sub_by_episode():
+    pass
 
 
 def main():
     config = load_config()
-    subtitles_exts = environ.get('SUBTITLES_EXTS', ['.srt', '.ssa', '.ass'])
+    subtitles_exts = config.get('SUBTITLES_EXTS', ['.srt', '.ssa', '.ass'])
+    search_languages = config.get('SEARCH_LANGS', ['en'])
 
     db_client = tvdb_api.TVDBClient()
     media_files = parse_media.scan_media()
@@ -111,7 +174,7 @@ def main():
     # Query all series espisode data
     data_cache = {}
     for series, tvdb_id in series_table.items():
-        for language in config['SEARCH_LANGS']:
+        for language in search_languages:
             data = data_cache.setdefault(series, [])
             data += db_client.get_episodes_by_series_id(tvdb_id, language=language)
         data_cache[series] = data

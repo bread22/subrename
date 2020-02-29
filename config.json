@@ -1,4 +1,5 @@
 {
+    "MEDIA_FILE_FORMAT": "{series} - S{season}E{episode} - {quality}",
     "SUBTITLES_EXTS": [".srt", ".ssa", ".ass"],
     "MEDIA_EXTS": [".mkv", ".avi", ".mp4"],
     "SEARCH_LANGS": ["en", "ja", "zh"],
