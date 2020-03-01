@@ -14,3 +14,4 @@ __pycache__/tvdb_api.cpython-36.pyc
 /__pycache__/tvdb_api.cpython-36.pyc
 subrename.log
 .coverage
+tmp/
