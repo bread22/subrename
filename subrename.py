@@ -2,7 +2,7 @@ from copy import deepcopy
 from os import rename
 import logging
 import re
-from os.path import splitext
+from os.path import splitext, join
 import sys
 
 import parse_media
@@ -229,7 +229,7 @@ def main():
         new_sub = '{0}.{1}{2}'.format(filename, config['SUBTITLE_LANG'], sub_ext)
         if sub_file != new_sub:
             log.info("Renaming {0} to {1}".format(sub_file, new_sub))
-            rename(sub_file, new_sub)
+            rename(join(path, sub_file), join(path, new_sub))
 
 
 if __name__ == '__main__':
