@@ -3,6 +3,7 @@ from os import rename
 import logging
 import re
 from os.path import splitext
+import sys
 
 import parse_media
 import tvdb_api
@@ -11,7 +12,7 @@ from utils import load_config
 log = logging.getLogger('subrename')
 log.setLevel(logging.DEBUG)
 fh = logging.FileHandler('subrename.log', mode='w')
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+formatter = logging.Formatter('[%(asctime)s] [ %(name)-25s ] [ %(levelname)-8s ] %(message)s')
 fh.setFormatter(formatter)
 log.addHandler(fh)
 
@@ -193,8 +194,10 @@ def main():
     subtitles_exts = config.get('SUBTITLES_EXTS', ['.srt', '.ssa', '.ass'])
     search_languages = config.get('SEARCH_LANGS', ['en'])
 
+    path = sys.argv[1]
+
     db_client = tvdb_api.TVDBClient()
-    media_files = parse_media.scan_media()
+    media_files = parse_media.scan_media(path)
     series_table = get_series_ids(media_files, db_client)
     series_table = update_series_alt_names(series_table, db_client)
 
@@ -207,7 +210,7 @@ def main():
             data += db_client.get_episodes_by_series_id(tvdb_id, language=language)
         data_cache[series] = data
 
-    sub_files = parse_media.get_file_names(path='.', exts=subtitles_exts)
+    sub_files = parse_media.get_file_names(path=path, exts=subtitles_exts)
 
     matching_subs = []
     for media_file, metadata in media_files.items():
