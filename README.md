@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/bread22/subrename.svg?branch=master)](https://travis-ci.com/bread22/subrename)  [![codecov](https://codecov.io/gh/bread22/subrename/branch/master/graph/badge.svg)](https://codecov.io/gh/bread22/subrename)  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bread22_subrename&metric=alert_status)](https://sonarcloud.io/dashboard?id=bread22_subrename)
+![](https://github.com/bread22/subrename/workflows/Build/badge.svg)  [![codecov](https://codecov.io/gh/bread22/subrename/branch/master/graph/badge.svg)](https://codecov.io/gh/bread22/subrename)  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bread22_subrename&metric=alert_status)](https://sonarcloud.io/dashboard?id=bread22_subrename)
   [![GitHub license](https://img.shields.io/github/license/bread22/subrename.svg)](https://github.com/bread22/subrename/blob/master/LICENSE)  [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/bread22/subrename.js/graphs/commit-activity)
 
 # subrename
