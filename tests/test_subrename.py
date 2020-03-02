@@ -16,18 +16,17 @@ class TestMain(TestCase):
         }
         metadata = {'series': 'show_A', 'season': 1, 'episode': 1}
         main.find_episode_metadata_for_media(metadata, data_cache) == {'series': 'show_A',
-                                                                            'season': 1,
-                                                                            'episode': 1,
-                                                                            'names': {'EP1', 'ABC'}}
+                                                                       'season': 1,
+                                                                       'episode': 1,
+                                                                       'names': {'EP1', 'ABC'}}
         metadata = {'series': 'show_A', 'season': 1, 'episode': 2}
         main.find_episode_metadata_for_media(metadata, data_cache) == {'series': 'show_A',
-                                                                            'season': 1,
-                                                                            'episode': 1,
-                                                                            'names': {'EP2'}}
+                                                                       'season': 1,
+                                                                       'episode': 1,
+                                                                       'names': {'EP2'}}
 
         metadata = {'series': 'show_A', 'season': 2, 'episode': 1}
         main.find_episode_metadata_for_media(metadata, data_cache) == {'series': 'show_A',
-                                                                            'season': 1,
-                                                                            'episode': 1,
-                                                                            'names': set()}
-
+                                                                       'season': 1,
+                                                                       'episode': 1,
+                                                                       'names': set()}
