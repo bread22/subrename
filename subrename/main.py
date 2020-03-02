@@ -1,13 +1,13 @@
-from copy import deepcopy
-from os import rename
 import logging
 import re
-from os.path import splitext, join
 import sys
+from copy import deepcopy
+from os import rename
+from os.path import splitext, join
 
-import parse_media
-import tvdb_api
-from utils import load_config
+from subrename import parse_media
+from subrename import tvdb_api
+from subrename.utils import load_config
 
 log = logging.getLogger('subrename')
 log.setLevel(logging.DEBUG)
